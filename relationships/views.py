@@ -7,6 +7,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse, StreamingHt
 from django.shortcuts import render
 from django.utils.http import urlquote
 from django.views.generic import ListView
+from django import template
 
 from .decorators import require_user
 from .models import RelationshipStatus, Relationship
@@ -102,20 +103,16 @@ def relationship_handler(request, user, status_slug, add=True,
 @login_required
 @require_user
 def relationship_manage(request, user, status_slug, accept=False, reject=False):
-	if request.method == 'POST':
-		try:
-	            	status = RelationshipStatus.objects.by_slug(self.status)
-        	except RelationshipStatus.DoesNotExist:
-            		raise template.TemplateSyntaxError('RelationshipStatus not found')
-		try:
-			TheRel = Relationship.objects.get(from_user=user, to_user=request.user, status=status)
-		except Relationship.DoesNotExist:
-			raise template.TemplateSyntaxError('Relationship not found')
+    	status = get_relationship_status_or_404(status_slug)
+	try:
+		TheRel = Relationship.objects.get(from_user=user, to_user=request.user, status=status)
+	except Relationship.DoesNotExist:
+		raise template.TemplateSyntaxError('Relationship not found')
 
-		if accept:
-		    TheRel.accept()
-		if reject and not accept:
-		    TheRel.reject()
+	if accept:
+	    request.user.relationships.accept(user, status)
+	if reject and not accept:
+	    request.user.relationships.reject(user, status)
 
 	return StreamingHttpResponse({'accept' : 'ok'})
 #Fin ajout
