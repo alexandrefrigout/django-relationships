@@ -118,21 +118,22 @@ class RelationshipManager(User._default_manager.__class__):
 	rel = Relationship.objects.get(
 		from_user=user,
 		to_user=self.instance,
-		status=status)
+		status=status,
+		site__pk=settings.SITE_ID)
 
 	rel.accepted=True
 	rel.save()
 	return rel
 
     def reject(self, user, status=None):
-	rel = Relationship.objects.get(
+	rel = Relationship.objects.filter(
 		from_user=user,
 		to_user=self.instance,
-		status=status)
+		status=status,
+		site__pk=settings.SITE_ID)
 
-	rel.rejected=True
-	rel.save()
-	return rel
+	rel.delete()
+	return True
 #Fin ajout
 
     def remove(self, user, status=None, symmetrical=False):
@@ -171,7 +172,7 @@ class RelationshipManager(User._default_manager.__class__):
         return dict(
             from_users__to_user=self.instance,
             from_users__status=status,
-	    to_users__accepted=accepted,
+	    from_users__accepted=accepted,
             from_users__site__pk=settings.SITE_ID
         )
 
@@ -188,7 +189,6 @@ class RelationshipManager(User._default_manager.__class__):
         """
 #        query = self._get_from_query(status)
         query = self._get_from_query(status, accepted)
-	print query
 
         if symmetrical:
             query.update(self._get_to_query(status, accepted))
@@ -220,13 +220,6 @@ class RelationshipManager(User._default_manager.__class__):
         from_relationships = self.get_relationships(status)
         to_relationships = self.get_related_to(status)
         return from_relationships.exclude(pk__in=to_relationships.values_list('pk'))
-
-#bonne inspiration pour faire la liste des demandes en attente
-#query = dict(
-#            to_users__to_user=self.instance,
-#            to_users__accepted=True,
-#            to_users__site__pk=settings.SITE_ID,
-#)
 
     def exists(self, user, status=None, symmetrical=False):
         """
