@@ -43,32 +43,31 @@ class IfRelationshipNode(template.Node):
 #Ajout Alex
 class IfAcceptedNode(template.Node):
     def __init__(self, nodelist_true, nodelist_false, *args):
-	self.nodelist_true = nodelist_true
+        self.nodelist_true = nodelist_true
         self.nodelist_false = nodelist_false
-	self.from_user, self.to_user, self.status = args
+        self.from_user, self.to_user, self.status = args
         self.status = self.status.replace('"', '')  # strip quotes
 
     def render(self, context):
-	from_user = template.resolve_variable(self.from_user, context)
+        from_user = template.resolve_variable(self.from_user, context)
         to_user = template.resolve_variable(self.to_user, context)
-	try:
+        try:
             status = RelationshipStatus.objects.by_slug(self.status)
         except RelationshipStatus.DoesNotExist:
             raise template.TemplateSyntaxError('RelationshipStatus not found')
-
+            
         TheRel = Relationship.objects.get(from_user=from_user, to_user=to_user, status=status)
-    	if TheRel.accepted:
-		return self.nodelist_true.render(context)
+        if TheRel.accepted:
+            return self.nodelist_true.render(context)
 
-        return self.nodelist_false.render(context)
 
     
 @register.tag
 def if_accepted(parser, token):
     bits = list(token.split_contents())
     if len(bits) != 4:
-	raise TemplateSyntaxError, "%r takes 3 arguments:\n%s" % \
-            (bits[0], if_relationship.__doc__)
+        raise TemplateSyntaxError, "%r takes 3 arguments:\n%s" % \
+                    (bits[0], if_relationship.__doc__)
     end_tag = 'end' + bits[0]
     nodelist_true = parser.parse(('else', end_tag))
     token = parser.next_token()
@@ -77,7 +76,7 @@ def if_accepted(parser, token):
         parser.delete_first_token()
     else:
         nodelist_false = template.NodeList()
-
+    
     return IfAcceptedNode(nodelist_true, nodelist_false, *bits[1:])
 
 

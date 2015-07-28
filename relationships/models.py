@@ -115,28 +115,28 @@ class RelationshipManager(User._default_manager.__class__):
 
 #Ajout Alex : prendre exemple sur le rmeove pour l'implementation
     def accept(self, user, status=None):
-	rel = Relationship.objects.get(
-		from_user=user,
-		to_user=self.instance,
-		status=status,
-		site__pk=settings.SITE_ID)
-	print rel
-	rel.accepted=True
-	rel.rejected=False
-	rel.save()
-	return rel
+	    rel = Relationship.objects.get(
+	    	from_user=user,
+	    	to_user=self.instance,
+	    	status=status,
+	    	site__pk=settings.SITE_ID)
+	    print rel
+	    rel.accepted=True
+	    rel.rejected=False
+	    rel.save()
+	    return rel
 
     def reject(self, user, status=None):
-	rel = Relationship.objects.get(
-		from_user=user,
-		to_user=self.instance,
-		status=status,
-		site__pk=settings.SITE_ID)
+	    rel = Relationship.objects.get(
+	    	from_user=user,
+	    	to_user=self.instance,
+	    	status=status,
+	    	site__pk=settings.SITE_ID)
 
-	rel.accepted=False
-	rel.rejected=True
-	rel.save()
-	return True
+	    rel.accepted=False
+	    rel.rejected=True
+	    rel.save()
+	    return rel
 #Fin ajout
 
     def remove(self, user, status=None, symmetrical=False):
@@ -183,8 +183,8 @@ class RelationshipManager(User._default_manager.__class__):
 
 #Ajout Alex
     def get_awaiting_requests(self, status, accepted=False):
-	query=self._get_from_query(status)
-	return User.objects.filter(**query)
+		query=self._get_from_query(status)
+		return User.objects.filter(**query)
 #Fin ajout
 #    def get_relationships(self, status, symmetrical=False):
     def get_relationships(self, status, accepted=True, rejected=False, symmetrical=False):
