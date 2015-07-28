@@ -2,6 +2,7 @@ LICENSE
 MANIFEST.in
 README.rst
 TODO.rst
+setup.cfg
 setup.py
 django_relationships.egg-info/PKG-INFO
 django_relationships.egg-info/SOURCES.txt
